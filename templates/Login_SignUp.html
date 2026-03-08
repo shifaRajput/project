@@ -9,64 +9,25 @@
 </head>
 <body>
 
-    <!--nav bar-->
-  <!-- Desktop Navbar -->
 <nav class="navbar desktop-navbar">
   <div class="navbar-left">
     <div class="logo-circle">2MB</div>
     <span class="brand-name">Computer</span>
   </div>
-
   <ul class="navbar-center">
-    <li class="active"><a href="{{ url_for('home') }}"><i class="fa-solid fa-house"></i> Home</a></li>
+    <li><a href="{{ url_for('home') }}"><i class="fa-solid fa-house"></i> Home</a></li>
     <li><a href="{{ url_for('sell_bp.sell_page') }}"><i class="fa-solid fa-tag"></i> Sell</a></li>
     <li><a href="{{ url_for('repair_bp.repair_page') }}"><i class="fa-solid fa-screwdriver-wrench"></i> Repair</a></li>
     <li><a href="{{ url_for('myorders.order_page') }}"><i class="fa-solid fa-box"></i> My Order</a></li>
-    <li><a href="{{ url_for('profile') }}"><i class="fa-solid fa-user"></i> Me</a></li>
+    <li class="active"><a href="{{ url_for('auth.profile') }}"><i class="fa-solid fa-user"></i> Me</a></li>
   </ul>
-
   <div class="navbar-right">
-    <a href="{{ url_for('cart') }}"><i class="fa-solid fa-cart-shopping"></i></a>
-    <a href="{{ url_for('wishlist') }}"><i class="fa-regular fa-heart"></i></a>
-  </div>
-</nav>
-<!-- Mobile Top Bar -->
-<nav class="mobile-topbar">
-  <div class="mobile-left">
-    <div class="logo-circle">2MB</div>
-    <span class="brand-name">Computer</span>
-  </div>
-
-  <div class="mobile-right">
-    <a href="{{ url_for('cart') }}"><i class="fa-solid fa-cart-shopping"></i></a>
-    <a href="{{ url_for('wishlist') }}"><i class="fa-regular fa-heart"></i></a>
+    <a href="{{ url_for('cart_bp.cart_page') }}"><i class="fa-solid fa-cart-shopping"></i></a>
+    <a href="{{ url_for('wishlist_bp.wishlist_page') }}"><i class="fa-regular fa-heart"></i></a>
   </div>
 </nav>
 
-<nav class="mobile-bottom-nav">
-  <a href="{{ url_for('home') }}" class="nav-item active">
-    <i class="fa-solid fa-house"></i>
-    <span>Home</span>
-  </a>
-  <a href="{{ url_for('sell_bp.sell_page') }}" class="nav-item">
-    <i class="fa-solid fa-tag"></i>
-    <span>Sell</span>
-  </a>
-  <a href="{{ url_for('repair_bp.repair_page') }}" class="nav-item">
-    <i class="fa-solid fa-screwdriver-wrench"></i>
-    <span>Repair</span>
-  </a>
-  <a href="{{ url_for('myorders.order_page') }}" class="nav-item">
-    <i class="fa-solid fa-box"></i>
-    <span>Orders</span>
-  </a>
-  <a href="{{ url_for('profile') }}" class="nav-item">
-    <i class="fa-solid fa-user"></i>
-    <span>Me</span>
-  </a>
-</nav>
-
-<div class="main-wrapper" style="margin-top: 80px; width: 100%; display: flex; justify-content: center;">
+<div class="main-wrapper" style="margin-top: 100px; width: 100%; display: flex; justify-content: center;">
 
   {% if user_data %}
     <div id="profileSection" class="profile-card" style="display:block; position: relative; margin: 0 auto;">
@@ -91,10 +52,9 @@
                 <input type="text" id="profileHouse" placeholder="House/Flat No.">
                 <input type="text" id="profileRoad" placeholder="Road/Area/Colony">
                 <div style="display:flex; gap:5px;">
-                  <input type="text" id="profileCity" placeholder="City">
-                  <input type="text" id="profileState" placeholder="State">
+                  <input type="text" id="profileCity" placeholder="City" style="flex:1;">
+                  <input type="text" id="profilePincode" placeholder="Pincode" maxlength="6" style="flex:1;">
                 </div>
-                <input type="text" id="profilePincode" placeholder="Pincode" maxlength="6">
                 <button class="save-btn" onclick="saveAddress()">Save Address</button>
             </div>
         </div>
@@ -119,6 +79,7 @@
   {% else %}
     <div class="scene" id="authScene">
       <div class="container" id="container">
+        
         <form class="form-container sign-up" id="signupForm">
           <h2>Create Account</h2>
           <input type="text" name="name" placeholder="Full Name" required>
@@ -130,7 +91,7 @@
           <div class="password-wrapper">
             <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
             <span class="toggle-eye" data-target="confirmPassword">👁</span>
-            <span id="successTick" class="tick">✓</span>
+            <span id="successTick" class="tick" style="display:none; color:#00c851; font-weight:bold; margin-left:5px;">✓</span>
           </div>
           <small id="signupMsg" class="error-text"></small>
           <button id="createAccount" type="submit" disabled>Sign Up</button>
@@ -140,6 +101,9 @@
           <h2>Login</h2>
           <input type="email" name="email" placeholder="Email" required>
           <input type="password" name="password" placeholder="Password" required>
+          <p class="forgot-link" id="forgotBtn" style="cursor:pointer; color:#666; font-size: 0.85rem; text-align:right; margin-bottom:10px;">
+            Forgot password?
+          </p>
           <small id="loginMsg" class="error-text"></small>
           <button type="submit">Login</button>
         </form>
@@ -161,8 +125,25 @@
   {% endif %}
 </div>
 
+<div class="forgot-modal" id="forgotModal">
+  <div class="forgot-box">
+    <h3>Reset Password</h3>
+    <input type="email" id="forgotEmail" placeholder="Enter your email" style="width:90%;">
+    <button id="sendForgot" style="margin-bottom: 10px;">Get Password</button>
+    <button id="closeForgot" style="background:#666;">Close</button>
+    <small id="forgotMsg" class="error-text" style="display:block; margin-top:10px;"></small>
+  </div>
+</div>
+
 <script>
-// Logic for Eye Icons
+// --- Panel Swapping Logic ---
+const container = document.getElementById("container");
+if(container) {
+    document.getElementById("signUp").onclick = () => container.classList.add("active");
+    document.getElementById("signIn").onclick = () => container.classList.remove("active");
+}
+
+// --- Password Eye Icon Toggle ---
 document.querySelectorAll(".toggle-eye").forEach(icon => {
   icon.addEventListener("click", () => {
     const input = document.getElementById(icon.dataset.target);
@@ -171,92 +152,87 @@ document.querySelectorAll(".toggle-eye").forEach(icon => {
   });
 });
 
-// Panel Swapping
-const container = document.getElementById("container");
-if(container) {
-    document.getElementById("signUp").onclick = () => container.classList.add("active");
-    document.getElementById("signIn").onclick = () => container.classList.remove("active");
-}
-
-// Password Validation Logic
+// --- Password Match Validation ---
 const password = document.getElementById("password");
 const confirmPassword = document.getElementById("confirmPassword");
 const tick = document.getElementById("successTick");
 const createBtn = document.getElementById("createAccount");
+const signupMsg = document.getElementById("signupMsg");
 
 if(password && confirmPassword) {
     function validatePasswords(){
-  const msg = document.getElementById("signupMsg");
-  const tick = document.getElementById("successTick"); // Make sure this ID exists in HTML
-  
-  if(confirmPassword.value === "") {
-    msg.textContent = ""; 
-    tick.style.display = "none"; 
-    createBtn.disabled = true; 
-    return;
-  }
-  
-  if(password.value !== confirmPassword.value){
-    // Passwords don't match
-    msg.textContent = "Passwords do not match"; 
-    msg.style.color = "#ff4d4d"; // Red
-    tick.style.display = "none"; 
-    createBtn.disabled = true;
-  } else {
-    // Passwords match
-    msg.textContent = "Passwords match! ✓"; // Adding the icon directly to text is easiest
-    msg.style.color = "#00c851"; // This is the GREEN color
-    tick.style.display = "inline-block"; // Show the separate tick if you have one
-    createBtn.disabled = false;
-  }
-}
+      if(confirmPassword.value === "") {
+        signupMsg.textContent = ""; tick.style.display = "none"; createBtn.disabled = true; return;
+      }
+      if(password.value !== confirmPassword.value){
+        signupMsg.textContent = "Passwords do not match";
+        signupMsg.style.color = "#ff4d4d"; // Red
+        tick.style.display = "none"; 
+        createBtn.disabled = true;
+      } else {
+        signupMsg.textContent = "Passwords match! ✓";
+        signupMsg.style.color = "#00c851"; // Green
+        tick.style.display = "inline"; 
+        createBtn.disabled = false;
+      }
+    }
     password.addEventListener("input", validatePasswords);
     confirmPassword.addEventListener("input", validatePasswords);
 }
 
-// Submission Logic
+// --- Login/Signup Form Submission ---
 async function handleSubmission(id, url, msgId) {
   const form = document.getElementById(id);
-  if (!form) return;
-  
+  if(!form) return;
+
   form.onsubmit = async (e) => {
     e.preventDefault();
     const msg = document.getElementById(msgId);
+    // Clear any previous error/success message
+    msg.textContent = "Processing..."; 
+    
     const formData = new FormData(form);
     
-    // Clear previous messages before starting
-    msg.textContent = "Processing...";
-    msg.style.color = "#000";
-
-    const response = await fetch(url, { method: "POST", body: formData });
-    const data = await response.json();
-    
-    if (data.success) {
-      // 1. Show only success message
+    try {
+      const response = await fetch(url, { method: "POST", body: formData });
+      const data = await response.json();
+      
       msg.textContent = data.message;
-      msg.style.color = "#00c851"; // Green
-
-      // 2. Redirect based on which form was used
-      setTimeout(() => {
-        if (id === "loginForm") {
-          window.location.href = "/profile"; 
-        } else if (id === "signupForm") {
-          // This will open the home page after signup
+      msg.style.color = data.success ? "#00c851" : "#ff4d4d";
+      
+      if(data.success) {
+        // Successful signup: wait 1s then redirect to Home
+        setTimeout(() => {
           window.location.href = "/"; 
-        }
-      }, 1000); // 1 second delay so user can see the "Success" message
-
-    } else {
-      // Show error message and STOP (won't show success)
-      msg.textContent = data.message;
-      msg.style.color = "#ff4d4d"; // Red
+        }, 1000);
+      }
+    } catch (err) {
+      msg.textContent = "Connection error.";
+      msg.style.color = "#ff4d4d";
     }
   };
 }
+
 handleSubmission("signupForm", "/signup", "signupMsg");
 handleSubmission("loginForm", "/login", "loginMsg");
 
-// Profile Functions
+// --- Forgot Password Modal ---
+const modal = document.getElementById("forgotModal");
+const forgotBtn = document.getElementById("forgotBtn");
+if(forgotBtn) {
+    forgotBtn.onclick = () => modal.classList.add("active");
+}
+document.getElementById("closeForgot").onclick = () => modal.classList.remove("active");
+document.getElementById("sendForgot").onclick = async () => {
+  const email = document.getElementById("forgotEmail").value;
+  const fMsg = document.getElementById("forgotMsg");
+  const response = await fetch("/forgot", { method: "POST", body: new URLSearchParams({ email }) });
+  const data = await response.json();
+  fMsg.textContent = data.message;
+  fMsg.style.color = data.success ? "#00c851" : "#ff4d4d";
+};
+
+// --- Profile Update Functions ---
 function toggleInput(type) {
     const area = document.getElementById(type === 'address' ? 'addressInputArea' : 'phoneInputArea');
     area.style.display = area.style.display === "none" ? "block" : "none";
@@ -273,7 +249,10 @@ async function saveField(field) {
 }
 
 async function saveAddress() {
-    const addr = `${document.getElementById('profileHouse').value}, ${document.getElementById('profileRoad').value}, ${document.getElementById('profileCity').value}`;
+    const house = document.getElementById('profileHouse').value;
+    const road = document.getElementById('profileRoad').value;
+    const city = document.getElementById('profileCity').value;
+    const addr = `${house}, ${road}, ${city}`;
     await fetch('/update_profile', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
