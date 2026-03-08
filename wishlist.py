@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template
 import sqlite3
 import os
 
@@ -29,6 +29,11 @@ def init_db():
 
 # Initialize the DB when the module is loaded
 init_db()
+
+# In wishlist.py
+@wishlist_bp.route('/wishlist')
+def wishlist_page(): 
+    return render_template('wishlist.html')
 
 @wishlist_bp.route("/wishlist/add", methods=["POST"])
 def add_product():
