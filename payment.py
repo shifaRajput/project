@@ -4,14 +4,13 @@ import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import threading
+import threading 
 
 # Initialize as a Blueprint
 payment_bp = Blueprint('payment', __name__)
 
-# Change this in payment.py
-BASE_DIR = os.path.abspath(os.path.dirname(__file__)) # Ensure absolute path
-DB_PATH = os.path.join(os.path.dirname(BASE_DIR), "ecommerce.db")
+BASE_DIR = os.path.dirname(__file__)
+DB_PATH = os.path.join(BASE_DIR, "users.db")
 
 def get_db():
     conn = sqlite3.connect(DB_PATH, timeout=10)
@@ -23,7 +22,7 @@ def init_db():
     c = conn.cursor()
     
     # Tables setup
-    c.execute('''CREATE TABLE IF NOT EXISTS user (
+    c.execute('''CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL, email TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL, address TEXT, phone TEXT)''')
@@ -86,7 +85,6 @@ def send_order_email(to_email, user_name):
 
 # ----------------- ROUTES -----------------
 
-
 @payment_bp.route('/payment.js')
 def serve_js():
     return send_from_directory(BASE_DIR, 'payment.js')
@@ -98,7 +96,7 @@ def get_user_by_name():
     if not name: return jsonify({"success": False})
 
     conn = get_db()
-    user = conn.execute("SELECT phone, address FROM user WHERE name = ? COLLATE NOCASE", (name,)).fetchone()
+    user = conn.execute("SELECT phone, address FROM users WHERE name = ? COLLATE NOCASE", (name,)).fetchone()
     conn.close()
 
     if user:
@@ -122,7 +120,7 @@ def get_my_orders():
     if 'user_email' not in session: return jsonify({"error": "Unauthorized"}), 401
         
     conn = get_db()
-    user = conn.execute("SELECT user_id, name FROM user WHERE email=?", (session['user_email'],)).fetchone()
+    user = conn.execute("SELECT user_id, name FROM users WHERE email=?", (session['user_email'],)).fetchone()
     
     orders = conn.execute("""
         SELECT o.id as order_id, o.quantity, o.total_price, o.status, 
@@ -145,7 +143,7 @@ def process_payment(order_id):
     
     conn = get_db()
     c = conn.cursor()
-    user = c.execute("SELECT user_id, name, email, phone, address FROM user WHERE email=?", (session['user_email'],)).fetchone()
+    user = c.execute("SELECT user_id, name, email, phone, address FROM users WHERE email=?", (session['user_email'],)).fetchone()
     u_id = user['user_id']
     user_email = user['email']
     user_name = user['name']
@@ -157,7 +155,7 @@ def process_payment(order_id):
     """, (method, new_address, order_id, u_id))
 
     if not user['phone'] or not user['address']:
-        c.execute("UPDATE user SET phone=COALESCE(phone, ?), address=COALESCE(address, ?) WHERE user_id=?", (new_phone, new_address, u_id))
+        c.execute("UPDATE users SET phone=COALESCE(phone, ?), address=COALESCE(address, ?) WHERE user_id=?", (new_phone, new_address, u_id))
 
     conn.commit()
     conn.close()
@@ -174,7 +172,7 @@ def add_test_orders():
         c = conn.cursor()
         
         # Get your specific user account
-        c.execute("SELECT user_id FROM user WHERE email='vidhimamania.2005@gmail.com'")
+        c.execute("SELECT user_id FROM users WHERE email='vidhimamania.2005@gmail.com'")
         user = c.fetchone()
         
         if user:
@@ -192,29 +190,3 @@ def add_test_orders():
             return "User not found in database!"
     except Exception as e:
         return f"Error: {e}"
-    
-    # Add this route to your payment.py
-@payment_bp.route('/initiate-checkout/<int:product_id>')
-def initiate_checkout(product_id):
-    if 'user_email' not in session:
-        return redirect(url_for('auth.auth_page')) # Adjust to your actual auth route
-
-    conn = get_db()
-    c = conn.cursor()
-    
-    # 1. Get user ID
-    user = c.execute("SELECT user_id FROM user WHERE email=?", (session['user_email'],)).fetchone()
-    
-    # 2. Get product price
-    product = c.execute("SELECT price FROM products WHERE product_id=?", (product_id,)).fetchone()
-    
-    # 3. Create a pending order record
-    c.execute('''INSERT INTO orders (user_id, product_id, quantity, total_price, status) 
-                 VALUES (?, ?, 1, ?, 'pending')''', 
-              (user['user_id'], product_id, product['price']))
-    
-    conn.commit()
-    conn.close()
-    
-    # 4. Redirect to your existing checkout page
-    return redirect(url_for('payment.checkout'))
