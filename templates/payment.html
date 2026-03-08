@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='payment.css') }}">
+</head>
+<body>
+
+  <!--nav bar-->
+  <!-- Desktop Navbar -->
+<nav class="navbar desktop-navbar">
+  <div class="navbar-left">
+    <div class="logo-circle">2MB</div>
+    <span class="brand-name">Computer</span>
+  </div>
+
+  <ul class="navbar-center">
+    <li class="active"><a href="{{ url_for('home') }}"><i class="fa-solid fa-house"></i> Home</a></li>
+    <li><a href="{{ url_for('sell_bp.sell_page') }}"><i class="fa-solid fa-tag"></i> Sell</a></li>
+    <li><a href="{{ url_for('repair_bp.repair_page') }}"><i class="fa-solid fa-screwdriver-wrench"></i> Repair</a></li>
+    <li><a href="{{ url_for('myorders.order_page') }}"><i class="fa-solid fa-box"></i> My Order</a></li>
+    <li><a href="{{ url_for('profile') }}"><i class="fa-solid fa-user"></i> Me</a></li>
+  </ul>
+
+  <div class="navbar-right">
+    <span id="navUserName"></span>
+    <a href="{{ url_for('cart') }}"><i class="fa-solid fa-cart-shopping"></i> <span id="bagCount">0</span></a>
+    <a href="{{ url_for('wishlist') }}"><i class="fa-regular fa-heart"></i></a>
+</div>
+</nav>
+<!-- Mobile Top Bar -->
+<nav class="mobile-topbar">
+  <div class="mobile-left">
+    <div class="logo-circle">2MB</div>
+    <span class="brand-name">Computer</span>
+  </div>
+
+  <div class="mobile-right">
+    <a href="{{ url_for('cart') }}"><i class="fa-solid fa-cart-shopping"></i></a>
+    <a href="{{ url_for('wishlist') }}"><i class="fa-regular fa-heart"></i></a>
+  </div>
+</nav>
+
+<nav class="mobile-bottom-nav">
+  <a href="{{ url_for('home') }}" class="nav-item active">
+    <i class="fa-solid fa-house"></i>
+    <span>Home</span>
+  </a>
+  <a href="{{ url_for('sell_bp.sell_page') }}" class="nav-item">
+    <i class="fa-solid fa-tag"></i>
+    <span>Sell</span>
+  </a>
+  <a href="{{ url_for('repair_bp.repair_page') }}" class="nav-item">
+    <i class="fa-solid fa-screwdriver-wrench"></i>
+    <span>Repair</span>
+  </a>
+  <a href="{{ url_for('myorders.order_page') }}" class="nav-item">
+    <i class="fa-solid fa-box"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{{ url_for('profile') }}" class="nav-item">
+    <i class="fa-solid fa-user"></i>
+    <span>Me</span>
+  </a>
+</nav>
+
+<div class="page-wrap">
+  <div class="page-title">Checkout</div>
+
+  <div class="stepper">
+    <div class="step active" id="step1indicator"><div class="step-circle">1</div><div class="step-label">Address</div></div>
+    <div class="step-line" id="line1"></div>
+    <div class="step" id="step2indicator"><div class="step-circle">2</div><div class="step-label">Order Summary</div></div>
+    <div class="step-line" id="line2"></div>
+    <div class="step" id="step3indicator"><div class="step-circle">3</div><div class="step-label">Payment</div></div>
+  </div>
+
+  <div class="checkout-layout">
+    <div>
+      <div class="step-content active card" id="stepContent1">
+        <div class="card-title">Delivery Address</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name <span>*</span></label>
+            <input type="text" id="fullName" value="{{ user.name }}" placeholder="Full name"/>
+            <div class="error-msg" id="errFullName"></div>
+          </div>
+          <div class="form-group">
+            <label>Phone Number <span>*</span></label>
+            <input type="tel" id="phone" value="{{ user.phone if user.phone else '' }}" placeholder="10-digit number" maxlength="10"/>
+            <div class="error-msg" id="errPhone"></div>
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label>House No. / Flat No. / Building <span>*</span></label>
+            <input type="text" id="house" placeholder="e.g., Flat 101, Building A"/>
+            <div class="error-msg" id="errHouse"></div>
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label>Road / Area / Colony <span>*</span></label>
+            <input type="text" id="road" placeholder="e.g., MG Road, Sector 15"/>
+            <div class="error-msg" id="errRoad"></div>
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label>Landmark (Optional)</label>
+            <input type="text" id="landmark" placeholder="e.g., Near Metro Station"/>
+          </div>
+        </div>
+        <div class="form-row triple">
+          <div class="form-group">
+            <label>City <span>*</span></label>
+            <input type="text" id="city" placeholder="City"/>
+            <div class="error-msg" id="errCity"></div>
+          </div>
+          <div class="form-group">
+            <label>State <span>*</span></label>
+            <input type="text" id="state" placeholder="State"/>
+            <div class="error-msg" id="errState"></div>
+          </div>
+          <div class="form-group">
+            <label>Pincode <span>*</span></label>
+            <input type="text" id="pincode" placeholder="6-digit" maxlength="6"/>
+            <div class="error-msg" id="errPincode"></div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="goToStep2()">Continue to Order Summary</button>
+      </div>
+
+      <div class="step-content card" id="stepContent2">
+        <div class="card-title">Order Summary</div>
+        <div class="address-preview" id="addressPreview"></div>
+        <div id="orderItemsList"></div>
+        <button class="btn-primary" onclick="goToStep3()">Continue to Payment</button>
+        <br/><button class="btn-back" onclick="goToStep(1)">← Back</button>
+      </div>
+
+      <div class="step-content card" id="stepContent3">
+        <div class="card-title">Payment Method</div>
+        <label class="payment-option" id="opt-gpay" onclick="selectPayment('gpay', this)">
+          <input type="radio" name="payMethod" value="gpay"/>
+          <span class="payment-icon">📱</span><span class="payment-label">Google Pay</span>
+        </label>
+        <div>
+          <label class="payment-option" id="opt-card" onclick="selectPayment('card', this)">
+            <input type="radio" name="payMethod" value="card"/>
+            <span class="payment-icon">💳</span><span class="payment-label">Credit/Debit Card</span>
+          </label>
+          <div class="card-fields" id="cardFields">
+            <div class="form-row single">
+              <div class="form-group"><label>Card Number</label><input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19"/></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>CVV</label><input type="password" id="cvv" placeholder="123" maxlength="4"/></div>
+              <div class="form-group"><label>Expiry Date</label><input type="text" id="expiry" placeholder="MM/YY" maxlength="5"/></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <label class="payment-option" id="opt-cod" onclick="selectPayment('cod', this)">
+            <input type="radio" name="payMethod" value="cod"/>
+            <span class="payment-icon">💵</span><span class="payment-label">Cash on Delivery</span>
+          </label>
+          <div class="cod-note" id="codNote">Cash on Delivery — Please keep exact change ready.</div>
+        </div>
+        <button class="btn-primary" id="payBtn" onclick="submitPayment()" style="margin-top:10px">
+          Pay <span id="payBtnAmount">₹0.00</span>
+        </button>
+        <br/><button class="btn-back" onclick="goToStep(2)">← Back</button>
+      </div>
+
+      <div class="step-content card" id="stepContentSuccess">
+        <div class="success-screen">
+          <div class="success-icon">✅</div>
+          <h2>Payment Successful!</h2>
+          <p id="successMsg">Your order has been placed.</p>
+          <br/><br/>
+          <button class="btn-primary" style="max-width:220px;margin:0 auto" onclick="window.location.href='/myorders'">Go to My Orders</button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="summary-section">
+    <div id="summaryItemsLabel">Items (0)</div>
+    <div id="summaryItemsAmt">₹0.00</div>
+    <div id="summaryTotal">₹0.00</div>
+    
+    <button id="payBtn" onclick="submitPayment()">
+        Pay <span id="payBtnAmount">₹0.00</span>
+    </button>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script src="{{ url_for('static', filename='payment.js') }}"></script>
+<script>
+    // --- MAGIC AUTO-FILL BY NAME ---
+  document.getElementById('fullName').addEventListener('blur', async function() {
+    const nameValue = this.value.trim();
+    if (!nameValue) return; // Do nothing if the box is empty
+
+    try {
+        const response = await fetch('/api/get-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: nameValue })
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            // 1. Fill Phone Number
+            if (data.phone) {
+                document.getElementById('phone').value = data.phone;
+            }
+            
+            // 2. Fill Address
+            if (data.address) {
+                // Check if using the single Full Address box
+                const fullAddressBox = document.getElementById('fullAddress');
+                if (fullAddressBox) {
+                    fullAddressBox.value = data.address;
+                } 
+                // Otherwise, unpack into the 5 separate boxes
+                else {
+                    let parts = data.address.split(', ');
+                    if (parts.length >= 4) {
+                        document.getElementById('house').value = parts[0] || '';
+                        document.getElementById('road').value = parts[1] || '';
+                        document.getElementById('city').value = parts[2] || '';
+                        
+                        let statePin = parts[3].split(' - ');
+                        document.getElementById('state').value = statePin[0] || '';
+                        document.getElementById('pincode').value = statePin[1] || '';
+                    }
+                }
+            }
+            // Show a little success popup!
+            showToast('User details auto-filled!', 'success');
+        }
+    } catch (err) {
+        console.error('Error fetching user data:', err);
+    }
+});
+</script>
+</body>
+</html>

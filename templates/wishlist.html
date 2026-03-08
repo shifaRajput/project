@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wishlist</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='wishlist.css') }}">
+
+    <!-- Icons -->
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<!--nav bar-->
+  <!-- Desktop Navbar -->
+<nav class="navbar desktop-navbar">
+  <div class="navbar-left">
+    <div class="logo-circle">2MB</div>
+    <span class="brand-name">Computer</span>
+  </div>
+
+  <ul class="navbar-center">
+    <li class="active"><a href="{{ url_for('home') }}"><i class="fa-solid fa-house"></i> Home</a></li>
+    <li><a href="{{ url_for('sell_bp.sell_page') }}"><i class="fa-solid fa-tag"></i> Sell</a></li>
+    <li><a href="{{ url_for('repair_bp.repair_page') }}"><i class="fa-solid fa-screwdriver-wrench"></i> Repair</a></li>
+    <li><a href="{{ url_for('myorders.order_page') }}"><i class="fa-solid fa-box"></i> My Order</a></li>
+    <li><a href="{{ url_for('profile') }}"><i class="fa-solid fa-user"></i> Me</a></li>
+  </ul>
+
+  <div class="navbar-right">
+    <a href="{{ url_for('cart') }}"><i class="fa-solid fa-cart-shopping"></i></a>
+    <a href="{{ url_for('wishlist') }}"><i class="fa-regular fa-heart"></i></a>
+  </div>
+</nav>
+<!-- Mobile Top Bar -->
+<nav class="mobile-topbar">
+  <div class="mobile-left">
+    <div class="logo-circle">2MB</div>
+    <span class="brand-name">Computer</span>
+  </div>
+
+  <div class="mobile-right">
+    <a href="{{ url_for('cart') }}"><i class="fa-solid fa-cart-shopping"></i></a>
+    <a href="{{ url_for('wishlist') }}"><i class="fa-regular fa-heart"></i></a>
+  </div>
+</nav>
+
+<nav class="mobile-bottom-nav">
+  <a href="{{ url_for('home') }}" class="nav-item active">
+    <i class="fa-solid fa-house"></i>
+    <span>Home</span>
+  </a>
+  <a href="{{ url_for('sell_bp.sell_page') }}" class="nav-item">
+    <i class="fa-solid fa-tag"></i>
+    <span>Sell</span>
+  </a>
+  <a href="{{ url_for('repair_bp.repair_page') }}" class="nav-item">
+    <i class="fa-solid fa-screwdriver-wrench"></i>
+    <span>Repair</span>
+  </a>
+  <a href="{{ url_for('myorders.order_page') }}" class="nav-item">
+    <i class="fa-solid fa-box"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{{ url_for('profile') }}" class="nav-item">
+    <i class="fa-solid fa-user"></i>
+    <span>Me</span>
+  </a>
+</nav>
+
+<h2 class="heading">My Wishlist</h2>
+
+<!-- wrap all products in a dedicated container so each one stands alone -->
+<div class="product-container">
+
+    <div class="product">
+        <!-- RED HEART -->
+        <div class="heart" onclick="removeProduct(this)">
+            <i class="fa fa-heart"></i>
+        </div>
+
+        <img src="hp2.jpg" class="product-img">
+
+        <h3 class="pname">HP Computer</h3>
+        <div class="rating">⭐⭐⭐⭐☆</div>
+        <p class="price">₹25,000</p>
+
+        <!-- ADD TO CART BUTTON -->
+        <button onclick="addToCart(this)">Add to Cart</button>
+    </div>
+    
+
+     <div class="product">
+        <!-- RED HEART -->
+        <div class="heart" onclick="removeProduct(this)">
+            <i class="fa fa-heart"></i>
+        </div>
+
+        <img src="dell-2.jpg" class="product-img">
+
+        <h3 class="pname">Dell Computer</h3>
+        <div class="rating">⭐⭐⭐⭐☆</div>
+        <p class="price">₹19,000</p>
+
+        <!-- ADD TO CART BUTTON -->
+        <button onclick="addToCart(this)">Add to Cart</button>
+    </div>
+
+      <div class="product">
+        <!-- RED HEART -->
+        <div class="heart" onclick="removeProduct(this)">
+            <i class="fa fa-heart"></i>
+        </div>
+
+        <img src="v603.jpg" class="product-img">
+        <h3 class="pname">Vivo V40</h3>
+        <div class="rating">⭐⭐⭐☆</div>
+        <p class="price">₹19,000</p>
+
+        <!-- ADD TO CART BUTTON -->
+        <button onclick="addToCart(this)">Add to Cart</button>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='wishlist.js') }}"></script>
+</body>
+</html>

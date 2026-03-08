@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Login Signup</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='Login_SignUp.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"> 
+</head>
+<body>
+
+    <!--nav bar-->
+  <!-- Desktop Navbar -->
+<nav class="navbar desktop-navbar">
+  <div class="navbar-left">
+    <div class="logo-circle">2MB</div>
+    <span class="brand-name">Computer</span>
+  </div>
+
+  <ul class="navbar-center">
+    <li class="active"><a href="{{ url_for('home') }}"><i class="fa-solid fa-house"></i> Home</a></li>
+    <li><a href="{{ url_for('sell_bp.sell_page') }}"><i class="fa-solid fa-tag"></i> Sell</a></li>
+    <li><a href="{{ url_for('repair_bp.repair_page') }}"><i class="fa-solid fa-screwdriver-wrench"></i> Repair</a></li>
+    <li><a href="{{ url_for('myorders.order_page') }}"><i class="fa-solid fa-box"></i> My Order</a></li>
+    <li><a href="{{ url_for('profile') }}"><i class="fa-solid fa-user"></i> Me</a></li>
+  </ul>
+
+  <div class="navbar-right">
+    <a href="{{ url_for('cart') }}"><i class="fa-solid fa-cart-shopping"></i></a>
+    <a href="{{ url_for('wishlist') }}"><i class="fa-regular fa-heart"></i></a>
+  </div>
+</nav>
+<!-- Mobile Top Bar -->
+<nav class="mobile-topbar">
+  <div class="mobile-left">
+    <div class="logo-circle">2MB</div>
+    <span class="brand-name">Computer</span>
+  </div>
+
+  <div class="mobile-right">
+    <a href="{{ url_for('cart') }}"><i class="fa-solid fa-cart-shopping"></i></a>
+    <a href="{{ url_for('wishlist') }}"><i class="fa-regular fa-heart"></i></a>
+  </div>
+</nav>
+
+<nav class="mobile-bottom-nav">
+  <a href="{{ url_for('home') }}" class="nav-item active">
+    <i class="fa-solid fa-house"></i>
+    <span>Home</span>
+  </a>
+  <a href="{{ url_for('sell_bp.sell_page') }}" class="nav-item">
+    <i class="fa-solid fa-tag"></i>
+    <span>Sell</span>
+  </a>
+  <a href="{{ url_for('repair_bp.repair_page') }}" class="nav-item">
+    <i class="fa-solid fa-screwdriver-wrench"></i>
+    <span>Repair</span>
+  </a>
+  <a href="{{ url_for('myorders.order_page') }}" class="nav-item">
+    <i class="fa-solid fa-box"></i>
+    <span>Orders</span>
+  </a>
+  <a href="{{ url_for('profile') }}" class="nav-item">
+    <i class="fa-solid fa-user"></i>
+    <span>Me</span>
+  </a>
+</nav>
+
+<div class="main-wrapper" style="margin-top: 80px; width: 100%; display: flex; justify-content: center;">
+
+  {% if user_data %}
+    <div id="profileSection" class="profile-card" style="display:block; position: relative; margin: 0 auto;">
+        <div class="profile-header">
+            <div class="initials-circle">{{ user_data.name[0].upper() }}</div>
+            <div class="user-meta">
+                <h2>{{ user_data.name }}</h2>
+                <p style="color: #666;">{{ user_data.email }}</p>
+            </div>
+        </div>
+
+        <div class="info-row">
+            <div class="row-top">
+                <span class="label" style="font-weight:bold; color:#444;">Delivery Address</span>
+                <button class="cyan-add-btn" onclick="toggleInput('address')">
+                  {{ 'Edit' if user_data.address else '+ADD' }}
+                </button>
+            </div>
+            <div id="addrDisplay" class="display-text">{{ user_data.address if user_data.address else 'Not added' }}</div>
+            
+            <div id="addressInputArea" class="input-area" style="display:none; padding-top: 10px;">
+                <input type="text" id="profileHouse" placeholder="House/Flat No.">
+                <input type="text" id="profileRoad" placeholder="Road/Area/Colony">
+                <div style="display:flex; gap:5px;">
+                  <input type="text" id="profileCity" placeholder="City">
+                  <input type="text" id="profileState" placeholder="State">
+                </div>
+                <input type="text" id="profilePincode" placeholder="Pincode" maxlength="6">
+                <button class="save-btn" onclick="saveAddress()">Save Address</button>
+            </div>
+        </div>
+
+        <div class="info-row">
+            <div class="row-top">
+                <span class="label" style="font-weight:bold; color:#444;">Phone No.</span>
+                <button class="cyan-add-btn" onclick="toggleInput('phone')">
+                  {{ 'Edit' if user_data.phone else '+ADD' }}
+                </button>
+            </div>
+            <div id="phoneDisplay" class="display-text">{{ user_data.phone if user_data.phone else 'Not added' }}</div>
+            <div id="phoneInputArea" class="input-area" style="display:none;">
+                <input type="text" id="phoneText" placeholder="10-digit number" maxlength="10">
+                <button class="save-btn" onclick="saveField('phone')">Save</button>
+            </div>
+        </div>
+        
+        <a href="{{ url_for('auth.logout') }}" class="logout-link">Logout</a>
+    </div>
+
+  {% else %}
+    <div class="scene" id="authScene">
+      <div class="container" id="container">
+        <form class="form-container sign-up" id="signupForm">
+          <h2>Create Account</h2>
+          <input type="text" name="name" placeholder="Full Name" required>
+          <input type="email" name="email" placeholder="Email" required>
+          <div class="password-wrapper">
+            <input type="password" name="password" id="password" placeholder="Password" required>
+            <span class="toggle-eye" data-target="password">👁</span>
+          </div>
+          <div class="password-wrapper">
+            <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+            <span class="toggle-eye" data-target="confirmPassword">👁</span>
+            <span id="successTick" class="tick">✓</span>
+          </div>
+          <small id="signupMsg" class="error-text"></small>
+          <button id="createAccount" type="submit" disabled>Sign Up</button>
+        </form>
+
+        <form class="form-container sign-in" id="loginForm">
+          <h2>Login</h2>
+          <input type="email" name="email" placeholder="Email" required>
+          <input type="password" name="password" placeholder="Password" required>
+          <small id="loginMsg" class="error-text"></small>
+          <button type="submit">Login</button>
+        </form>
+
+        <div class="overlay-container">
+          <div class="overlay">
+            <div class="overlay-panel overlay-left">
+              <h2>Welcome Back!</h2>
+              <button id="signIn">Login</button>
+            </div>
+            <div class="overlay-panel overlay-right">
+              <h2>Hello Friend!</h2>
+              <button id="signUp">Sign Up</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+// Logic for Eye Icons
+document.querySelectorAll(".toggle-eye").forEach(icon => {
+  icon.addEventListener("click", () => {
+    const input = document.getElementById(icon.dataset.target);
+    input.type = input.type === "password" ? "text" : "password";
+    icon.textContent = input.type === "password" ? "👁" : "🙈";
+  });
+});
+
+// Panel Swapping
+const container = document.getElementById("container");
+if(container) {
+    document.getElementById("signUp").onclick = () => container.classList.add("active");
+    document.getElementById("signIn").onclick = () => container.classList.remove("active");
+}
+
+// Password Validation Logic
+const password = document.getElementById("password");
+const confirmPassword = document.getElementById("confirmPassword");
+const tick = document.getElementById("successTick");
+const createBtn = document.getElementById("createAccount");
+
+if(password && confirmPassword) {
+    function validatePasswords(){
+  const msg = document.getElementById("signupMsg");
+  const tick = document.getElementById("successTick"); // Make sure this ID exists in HTML
+  
+  if(confirmPassword.value === "") {
+    msg.textContent = ""; 
+    tick.style.display = "none"; 
+    createBtn.disabled = true; 
+    return;
+  }
+  
+  if(password.value !== confirmPassword.value){
+    // Passwords don't match
+    msg.textContent = "Passwords do not match"; 
+    msg.style.color = "#ff4d4d"; // Red
+    tick.style.display = "none"; 
+    createBtn.disabled = true;
+  } else {
+    // Passwords match
+    msg.textContent = "Passwords match! ✓"; // Adding the icon directly to text is easiest
+    msg.style.color = "#00c851"; // This is the GREEN color
+    tick.style.display = "inline-block"; // Show the separate tick if you have one
+    createBtn.disabled = false;
+  }
+}
+    password.addEventListener("input", validatePasswords);
+    confirmPassword.addEventListener("input", validatePasswords);
+}
+
+// Submission Logic
+async function handleSubmission(id, url, msgId) {
+  const form = document.getElementById(id);
+  if (!form) return;
+  
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById(msgId);
+    const formData = new FormData(form);
+    
+    // Clear previous messages before starting
+    msg.textContent = "Processing...";
+    msg.style.color = "#000";
+
+    const response = await fetch(url, { method: "POST", body: formData });
+    const data = await response.json();
+    
+    if (data.success) {
+      // 1. Show only success message
+      msg.textContent = data.message;
+      msg.style.color = "#00c851"; // Green
+
+      // 2. Redirect based on which form was used
+      setTimeout(() => {
+        if (id === "loginForm") {
+          window.location.href = "/profile"; 
+        } else if (id === "signupForm") {
+          // This will open the home page after signup
+          window.location.href = "/"; 
+        }
+      }, 1000); // 1 second delay so user can see the "Success" message
+
+    } else {
+      // Show error message and STOP (won't show success)
+      msg.textContent = data.message;
+      msg.style.color = "#ff4d4d"; // Red
+    }
+  };
+}
+handleSubmission("signupForm", "/signup", "signupMsg");
+handleSubmission("loginForm", "/login", "loginMsg");
+
+// Profile Functions
+function toggleInput(type) {
+    const area = document.getElementById(type === 'address' ? 'addressInputArea' : 'phoneInputArea');
+    area.style.display = area.style.display === "none" ? "block" : "none";
+}
+
+async function saveField(field) {
+    const val = document.getElementById('phoneText').value;
+    await fetch('/update_profile', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ field: field, value: val })
+    });
+    window.location.reload();
+}
+
+async function saveAddress() {
+    const addr = `${document.getElementById('profileHouse').value}, ${document.getElementById('profileRoad').value}, ${document.getElementById('profileCity').value}`;
+    await fetch('/update_profile', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ field: 'address', value: addr })
+    });
+    window.location.reload();
+}
+</script>
+</body>
+</html>
