@@ -1,8 +1,8 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify, session, render_template
 import sqlite3
 from model import db, Product
 
-cart_bp = Blueprint('cart_api', __name__)
+cart_bp = Blueprint('cart_bp', __name__)
 
 # ----------------------
 # DATABASE CREATE
@@ -26,6 +26,10 @@ create_table()
 # ----------------------
 # ADD PRODUCT
 # ----------------------
+@cart_bp.route('/cart') # The route endpoint
+def cart_page(): # The function name must match the second part of url_for
+    return render_template('cart.html')
+
 @cart_bp.route("/add", methods=["POST"])
 def add_product():
     data = request.get_json()
